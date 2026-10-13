@@ -3,6 +3,7 @@
 // - Renders Home, Movies, TV, My List
 // - Search, pagination, modal player, localStorage My List
 // - Admin panel to add movies (saved to localStorage) and export JSON
+// - Easter egg: clicking AH 10 times opens admin panel
 
 const DATA_URL = 'data/movies.json';
 const PER_PAGE = 8;
@@ -346,6 +347,29 @@ function setupEvents(){
     state.route = route;
     renderCurrentRoute();
   });
+
+  // AH easter egg: click the brand 10 times (within short interval) to open admin
+  (function(){
+    const brandEl = qs('#brandAH');
+    if(!brandEl) return;
+    let count = 0;
+    let timer = null;
+    function resetCount(){ count = 0; if(timer){ clearTimeout(timer); timer = null; } }
+    brandEl.addEventListener('click', ()=>{
+      count += 1;
+      if(timer) clearTimeout(timer);
+      timer = setTimeout(resetCount, 3000); // reset after 3s of inactivity
+      if(count >= 10){
+        resetCount();
+        state.route = 'admin';
+        history.pushState({route:'admin'}, '', '#admin');
+        renderCurrentRoute();
+        // small feedback
+        alert('Admin panel unlocked');
+      }
+    });
+    brandEl.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') brandEl.click(); });
+  })();
 }
 
 // Init
