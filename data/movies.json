@@ -1,110 +1,682 @@
-[
-  {
-    "id": "m1",
-    "title": "Midnight Signal",
-    "img": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=60",
-    "desc": "A disgraced radio host discovers a hidden signal from the future.",
-    "year": 2026,
-    "genre": "Action",
-    "duration": "2h 14m",
-    "rating": "8.9",
-    "video": "aqz-KE-bpKQ",
-    "type": "movie"
-  },
-  {
-    "id": "m2",
-    "title": "The Last Horizon",
-    "img": "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=900&q=60",
-    "desc": "Escape to the last frontier in an epic journey.",
-    "year": 2025,
-    "genre": "Drama",
-    "duration": "1h 58m",
-    "rating": "8.3",
-    "video": "ScMzIvxBSi4",
-    "type": "movie"
-  },
-  {
-    "id": "m3",
-    "title": "Shadow Echo",
-    "img": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=60",
-    "desc": "Secrets echoed through the alleys of a neon city.",
-    "year": 2024,
-    "genre": "Thriller",
-    "duration": "2h 04m",
-    "rating": "8.6",
-    "video": "dQw4w9WgXcQ",
-    "type": "tv"
-  },
-  {
-    "id": "m4",
-    "title": "Glass City",
-    "img": "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=900&q=60",
-    "desc": "A reporter uncovers a city built on glass lies.",
-    "year": 2023,
-    "genre": "Mystery",
-    "duration": "1h 46m",
-    "rating": "7.9",
-    "video": "kXYiU_JCYtU",
-    "type": "movie"
-  },
-  {
-    "id": "m5",
-    "title": "Nightfall",
-    "img": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=900&q=60",
-    "desc": "When night falls, heroes rise.",
-    "year": 2022,
-    "genre": "Action",
-    "duration": "2h 01m",
-    "rating": "8.1",
-    "video": "J---aiyznGQ",
-    "type": "movie"
-  },
-  {
-    "id": "m6",
-    "title": "Silver Moon",
-    "img": "https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=900&q=60",
-    "desc": "A sci-fi epic about a colony on the far side of the moon.",
-    "year": 2024,
-    "genre": "Sci-Fi",
-    "duration": "2h 19m",
-    "rating": "9.6",
-    "video": "3JZ_D3ELwOQ",
-    "type": "movie"
-  },
-  {
-    "id": "m7",
-    "title": "Black Harbor",
-    "img": "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&q=60",
-    "desc": "A small town's secrets come to light when the harbor freezes over.",
-    "year": 2021,
-    "genre": "Drama",
-    "duration": "1h 52m",
-    "rating": "9.4",
-    "video": "L_jWHffIx5E",
-    "type": "movie"
-  },
-  {
-    "id": "pd_a_trip_to_the_moon",
-    "title": "A Trip to the Moon (1902)",
-    "img": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Le_Voyage_dans_la_lune.jpg",
-    "desc": "Georges Méliès' classic silent short — public domain.",
-    "year": 1902,
-    "genre": "Silent",
-    "duration": "14m",
-    "rating": "8.5",
-    "video": "7JDaOOw0MEE",
-    "type": "movie"
-  },
-  {
-    "id": "pd_nosferatu_1922",
-    "title": "Nosferatu (1922)",
-    "img": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Nosferatu_poster.jpg",
-    "desc": "F.W. Murnau's silent horror classic — public domain in many regions.",
-    "year": 1922,
-    "genre": "Horror",
-    "duration": "1h 34m",
-    "rating": "8.1",
-    "video": "wLayKU1IYgU",
-    "type": "movie"
+const DATA_URL = 'data/movies.json';
+const PER_PAGE = 8;
+
+let MOVIES = [];
+let state = { route: 'home', query: '', page: 1, filterGenre: null };
+
+const ACCOUNTS_KEY = 'ah_accounts_v1';
+const CURRENT_USER_KEY = 'ah_current_user_v1';
+const WATCHED_KEY = 'ah_watched_v1';
+const MYLIST_KEY = 'ah_mylist_v1';
+const ADMIN_UNLOCK_KEY = 'ah_admin_unlocked_v1';
+
+const qs = s => document.querySelector(s);
+const qsa = s => Array.from(document.querySelectorAll(s));
+
+function getAccounts() {
+  try { return JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function saveAccounts(accounts) {
+  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+}
+
+function getCurrentUser() {
+  try { return JSON.parse(localStorage.getItem(CURRENT_USER_KEY) || 'null'); }
+  catch { return null; }
+}
+
+function setCurrentUser(user) {
+  localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+}
+
+function clearCurrentUser() {
+  localStorage.removeItem(CURRENT_USER_KEY);
+}
+
+function getWatchedMap() {
+  try { return JSON.parse(localStorage.getItem(WATCHED_KEY) || '{}'); }
+  catch { return {}; }
+}
+
+function saveWatchedMap(map) {
+  localStorage.setItem(WATCHED_KEY, JSON.stringify(map));
+}
+
+function getUserWatched(userId) {
+  const map = getWatchedMap();
+  return map[userId] || [];
+}
+
+function markMovieWatched(userId, movieId) {
+  const map = getWatchedMap();
+  const arr = new Set(map[userId] || []);
+  arr.add(movieId);
+  map[userId] = [...arr];
+  saveWatchedMap(map);
+}
+
+function getUserMyList(userId) {
+  try {
+    const raw = JSON.parse(localStorage.getItem(MYLIST_KEY) || '{}');
+    return raw[userId] || [];
+  } catch {
+    return [];
   }
-]
+}
+
+function saveUserMyList(userId, list) {
+  const raw = (() => {
+    try { return JSON.parse(localStorage.getItem(MYLIST_KEY) || '{}'); }
+    catch { return {}; }
+  })();
+  raw[userId] = list;
+  localStorage.setItem(MYLIST_KEY, JSON.stringify(raw));
+}
+
+function toggleMyList(movieId) {
+  const user = getCurrentUser();
+  if (!user) {
+    openAuthModal();
+    return;
+  }
+  const list = getUserMyList(user.id);
+  const next = list.includes(movieId) ? list.filter(id => id !== movieId) : [...list, movieId];
+  saveUserMyList(user.id, next);
+  renderCurrentRoute();
+}
+
+async function loadData() {
+  try {
+    const res = await fetch(DATA_URL);
+    const data = await res.json();
+    MOVIES = Array.isArray(data) ? data : [];
+  } catch (e) {
+    console.error('Failed to load movies.json', e);
+    MOVIES = [];
+  }
+
+  const base = MOVIES.slice();
+  const extra = FREE_LIBRARY;
+  MOVIES = [...base, ...extra];
+}
+
+function el(tag, attrs = {}, ...children) {
+  const e = document.createElement(tag);
+  Object.entries(attrs).forEach(([k, v]) => {
+    if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2), v);
+    else if (k === 'html') e.innerHTML = v;
+    else e.setAttribute(k, v);
+  });
+  children.forEach(c => {
+    if (c == null) return;
+    e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  });
+  return e;
+}
+
+function createCard(movie) {
+  const user = getCurrentUser();
+  const watched = user ? getUserWatched(user.id) : [];
+  const card = el('article', { class: 'movie-card', tabindex: 0, 'data-id': movie.id });
+  const img = el('img', { src: movie.img, alt: movie.title });
+  const info = el('div', { class: 'movie-info' },
+    el('div', { class: 'movie-name' }, movie.title),
+    el('div', { class: 'movie-sub muted' }, `${movie.genre} • ${movie.duration}`),
+    watched.includes(movie.id) ? el('div', { class: 'watched-pill' }, 'Watched') : el('div', { class: 'watch-pill' }, 'New')
+  );
+  card.appendChild(img);
+  card.appendChild(info);
+  card.addEventListener('click', () => openPlayer(movie));
+  card.addEventListener('keydown', (e) => { if (e.key === 'Enter') openPlayer(movie); });
+  return card;
+}
+
+function openPlayer(movie) {
+  const iframe = qs('#playerIframe');
+  const modal = qs('#modal');
+  const raw = movie.video || '';
+  let embed = '';
+
+  if (!raw) {
+    alert('No source URL for this title.');
+    return;
+  }
+
+  if (raw.startsWith('http://') || raw.startsWith('https://')) {
+    embed = raw;
+  } else {
+    embed = `https://www.youtube.com/embed/${raw}`;
+  }
+
+  if (movie.embedType === 'archive' && !raw.startsWith('http')) {
+    embed = `https://archive.org/embed/${raw}`;
+  }
+
+  iframe.src = `${embed}${embed.includes('?') ? '&' : '?'}autoplay=1&rel=0`;
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+
+  const user = getCurrentUser();
+  if (user) {
+    markMovieWatched(user.id, movie.id);
+    renderCurrentRoute();
+  }
+}
+
+function closePlayer() {
+  qs('#playerIframe').src = '';
+  qs('#modal').classList.remove('open');
+  qs('#modal').setAttribute('aria-hidden', 'true');
+}
+
+function renderHero(featured) {
+  const hero = el('section', { class: 'hero page-section', id: 'hero' });
+  const left = el('div', { style: 'flex:1' },
+    el('div', { class: 'hero-copy' },
+      el('div', { style: 'display:inline-block;background:rgba(255,255,255,0.06);padding:6px 12px;border-radius:999px;font-weight:700;font-size:.78rem;margin-bottom:10px' }, 'Now Streaming'),
+      el('h1', {}, featured.title),
+      el('div', { style: 'display:flex;gap:12px;align-items:center;color:var(--muted);margin-top:8px' },
+        el('div', { class: 'muted' }, String(featured.year || '')),
+        el('div', { class: 'muted' }, '•'),
+        el('div', { class: 'muted' }, featured.genre || 'Free'),
+        el('div', { class: 'muted' }, `• ${featured.duration || 'n/a'}`)
+      ),
+      el('p', {}, featured.desc || ''),
+      el('div', { style: 'margin-top:18px;display:flex;gap:12px' },
+        el('button', { class: 'btn btn-primary', onclick: () => openPlayer(featured) }, '▶ Watch Now'),
+        el('button', { class: 'btn', onclick: () => toggleMyList(featured.id), style: 'background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.04)' }, '+ My List')
+      )
+    )
+  );
+
+  const poster = el('div', { class: 'hero-poster' }, el('img', { src: featured.img || 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=60', alt: featured.title }));
+  hero.appendChild(left);
+  hero.appendChild(poster);
+  return hero;
+}
+
+function paginate(items, page = 1, per = PER_PAGE) {
+  const total = Math.max(1, Math.ceil(items.length / per));
+  const start = (page - 1) * per;
+  return { items: items.slice(start, start + per), page, total };
+}
+
+function renderPager(page, total) {
+  const pager = el('div', { class: 'pager' });
+  if (total <= 1) return pager;
+  for (let p = 1; p <= total; p++) {
+    const btn = el('button', { onclick: () => { state.page = p; renderCurrentRoute(); }, class: p === page ? 'active' : '' }, String(p));
+    pager.appendChild(btn);
+  }
+  return pager;
+}
+
+function renderHome() {
+  const featured = MOVIES[0] || { title: 'No title', desc: '', img: '', year: '', genre: '', duration: '' };
+  const container = el('div', {});
+  container.appendChild(renderHero(featured));
+
+  const contentWrap = el('div', { class: 'content' });
+  const main = el('main', { class: 'main-col' });
+  const side = el('aside', { class: 'side-col' });
+
+  const contPanel = el('section', { class: 'panel' },
+    el('div', { class: 'section-head' }, el('div', { class: 'section-title' }, 'Continue Watching'), el('div', { class: 'muted' }, 'View all')),
+    el('div', { id: 'continueList', class: 'horizontal-list' })
+  );
+  const contListEl = contPanel.querySelector('#continueList');
+  MOVIES.slice(0, 4).forEach(m => contListEl.appendChild(createCard(m)));
+
+  const trendPanel = el('section', { class: 'panel' },
+    el('div', { class: 'section-head' }, el('div', { class: 'section-title' }, 'Trending Now'), el('div', { class: 'muted' }, 'Browse all')),
+    el('div', { id: 'trendingList', class: 'horizontal-list' })
+  );
+  const trendingListEl = trendPanel.querySelector('#trendingList');
+  MOVIES.forEach((m, idx) => {
+    if (idx >= 4) trendingListEl.appendChild(createCard(m));
+  });
+
+  const genresPanel = el('section', { class: 'panel' },
+    el('div', { class: 'section-head' }, el('div', { class: 'section-title' }, 'Popular Genres')),
+    el('div', { id: 'genresList', class: 'genres' })
+  );
+  const genres = [...new Set(MOVIES.map(m => m.genre))];
+  genres.forEach(g => genresPanel.querySelector('#genresList').appendChild(
+    el('span', { class: 'chip', onclick: () => { state.filterGenre = g; state.route = 'movies'; state.page = 1; renderCurrentRoute(); } }, g)
+  ));
+
+  const topPanel = el('div', { class: 'panel' },
+    el('div', { class: 'section-title' }, 'Top 10 Today'),
+    el('ul', { id: 'topList', class: 'rank-list' })
+  );
+  const topListEl = topPanel.querySelector('#topList');
+  MOVIES.slice().sort((a, b) => parseFloat(b.rating || 0) - parseFloat(a.rating || 0)).slice(0, 10).forEach((m, i) => {
+    const li = el('li', { class: 'rank-item', onclick: () => openPlayer(m) },
+      el('div', {}, el('div', { style: 'font-weight:700' }, `${i + 1}. ${m.title}`), el('div', { class: 'muted', style: 'margin-top:4px' }, `${m.genre} • ${m.duration}`)),
+      el('div', {}, m.rating || '—')
+    );
+    topListEl.appendChild(li);
+  });
+
+  main.appendChild(contPanel);
+  main.appendChild(trendPanel);
+  main.appendChild(genresPanel);
+
+  side.appendChild(topPanel);
+  side.appendChild(el('div', { class: 'panel' },
+    el('div', { class: 'section-title' }, 'Quick Picks'),
+    el('div', { style: 'margin-top:10px;display:flex;flex-direction:column;gap:10px' },
+      el('div', {}, el('strong', {}, 'Fresh Releases'), el('div', { class: 'muted' }, 'Updated today')),
+      el('div', {}, el('strong', {}, 'Award Winners'), el('div', { class: 'muted' }, 'Top-rated picks')),
+      el('div', {}, el('strong', {}, 'New TV Series'), el('div', { class: 'muted' }, 'Latest episodes'))
+    )
+  ));
+
+  contentWrap.appendChild(main);
+  contentWrap.appendChild(side);
+  container.appendChild(contentWrap);
+  return container;
+}
+
+function renderListPage(title, items) {
+  const container = el('div', {});
+  container.appendChild(el('section', { class: 'panel' },
+    el('div', { class: 'section-head' },
+      el('div', { class: 'section-title' }, title),
+      el('div', { class: 'muted' }, `${items.length} results`)
+    ),
+    el('div', { id: 'listArea', class: 'horizontal-list' })
+  ));
+
+  const pag = paginate(items, state.page, PER_PAGE);
+  const listArea = container.querySelector('#listArea');
+  pag.items.forEach(m => listArea.appendChild(createCard(m)));
+  container.appendChild(renderPager(pag.page, pag.total));
+  return container;
+}
+
+function renderMyList() {
+  const user = getCurrentUser();
+  const ids = user ? getUserMyList(user.id) : [];
+  const items = MOVIES.filter(m => ids.includes(m.id));
+  return renderListPage('My List', items);
+}
+
+function renderAdmin() {
+  const container = el('div', {});
+  const panel = el('section', { class: 'panel' },
+    el('div', { class: 'section-head' },
+      el('div', { class: 'section-title' }, 'Admin — Add Movie'),
+      el('div', { class: 'muted' }, 'Local admin (stored in your browser)')
+    ),
+    el('form', { id: 'adminForm' },
+      el('div', {}, 'Title', el('input', { name: 'title', required: true, style: 'width:100%;margin-top:6px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text)' })),
+      el('div', { style: 'margin-top:10px' }, 'Year', el('input', { name: 'year', type: 'number', style: 'width:100%;margin-top:6px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text)' })),
+      el('div', { style: 'margin-top:10px' }, 'Genre', el('input', { name: 'genre', style: 'width:100%;margin-top:6px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text)' })),
+      el('div', { style: 'margin-top:10px' }, 'Duration', el('input', { name: 'duration', placeholder: 'e.g. 1h 45m', style: 'width:100%;margin-top:6px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text)' })),
+      el('div', { style: 'margin-top:10px' }, 'Poster Image URL', el('input', { name: 'img', placeholder: 'https://...', style: 'width:100%;margin-top:6px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text)' })),
+      el('div', { style: 'margin-top:10px' }, 'Embed URL or YouTube ID', el('input', { name: 'video', placeholder: 'YouTube ID or https://...', required: true, style: 'width:100%;margin-top:6px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text)' })),
+      el('div', { style: 'margin-top:10px;display:flex;gap:8px' },
+        el('button', { type: 'submit', class: 'btn btn-primary' }, 'Add Movie'),
+        el('button', { type: 'button', id: 'exportBtn', class: 'btn' }, 'Export JSON')
+      )
+    )
+  );
+
+  const listPanel = el('section', { class: 'panel', style: 'margin-top:12px' },
+    el('div', { class: 'section-title' }, 'Admin Additions (local)'),
+    el('div', { id: 'adminList', style: 'margin-top:10px;display:flex;flex-direction:column;gap:8px' })
+  );
+
+  panel.querySelector('#adminForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const val = (fd.get('video') || '').trim();
+    const movie = {
+      id: 'adm_' + Date.now(),
+      title: (fd.get('title') || '').trim(),
+      img: (fd.get('img') || '').trim() || 'https://via.placeholder.com/640x360?text=No+Image',
+      desc: 'Added via admin',
+      year: parseInt(fd.get('year')) || 2026,
+      genre: (fd.get('genre') || 'Misc').trim(),
+      duration: (fd.get('duration') || '').trim() || '1h 30m',
+      rating: '8.0',
+      video: val,
+      embedType: val.startsWith('http') && val.includes('archive.org') ? 'archive' : 'youtube',
+      type: 'movie'
+    };
+
+    const arr = JSON.parse(localStorage.getItem('ah_admin_additions_v1') || '[]');
+    arr.unshift(movie);
+    localStorage.setItem('ah_admin_additions_v1', JSON.stringify(arr));
+    MOVIES.unshift(movie);
+    renderCurrentRoute();
+    e.target.reset();
+    alert('Movie added locally. Export JSON to save or ask Copilot to commit it to the repo.');
+  });
+
+  panel.querySelector('#exportBtn').addEventListener('click', () => {
+    const data = JSON.parse(localStorage.getItem('ah_admin_additions_v1') || '[]');
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = el('a', { href: url, download: 'admin-additions.json' });
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  });
+
+  container.appendChild(panel);
+  container.appendChild(listPanel);
+
+  const adminListEl = container.querySelector('#adminList');
+  const arr = JSON.parse(localStorage.getItem('ah_admin_additions_v1') || '[]');
+  if (arr.length === 0) adminListEl.appendChild(el('div', { class: 'muted' }, 'No local additions yet.'));
+  arr.forEach(m => {
+    const row = el('div', { style: 'display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)' },
+      el('div', {}, el('div', { style: 'font-weight:700' }, m.title), el('div', { class: 'muted' }, `${m.genre} • ${m.duration}`)),
+      el('div', {},
+        el('button', { class: 'btn', onclick: () => { navigator.clipboard.writeText(JSON.stringify(m)); alert('Single movie JSON copied to clipboard'); } }, 'Copy'),
+        el('button', { class: 'btn', style: 'margin-left:8px', onclick: () => {
+          const newList = JSON.parse(localStorage.getItem('ah_admin_additions_v1') || '[]').filter(x => x.id !== m.id);
+          localStorage.setItem('ah_admin_additions_v1', JSON.stringify(newList));
+          MOVIES = MOVIES.filter(x => x.id !== m.id);
+          renderAdmin();
+          renderCurrentRoute();
+        } }, 'Remove')
+      )
+    );
+    adminListEl.appendChild(row);
+  });
+
+  return container;
+}
+
+function renderCurrentRoute() {
+  const app = qs('#app');
+  app.innerHTML = '';
+
+  let route = state.route || 'home';
+  const q = (state.query || '').trim().toLowerCase();
+
+  if (route === 'home') {
+    app.appendChild(renderHome());
+  } else if (route === 'mylist') {
+    app.appendChild(renderMyList());
+  } else if (route === 'admin') {
+    if (localStorage.getItem(ADMIN_UNLOCK_KEY) === '1') {
+      app.appendChild(renderAdmin());
+    } else {
+      state.route = 'home';
+      history.replaceState({}, '', '#home');
+      app.appendChild(renderHome());
+    }
+  } else {
+    let items = MOVIES.slice();
+    if (state.filterGenre) items = items.filter(m => m.genre === state.filterGenre);
+    if (route === 'tv') items = items.filter(m => m.type === 'tv' || /tv|series|show/i.test(m.genre));
+    if (route === 'new') items = items.filter(m => m.year >= 2023);
+    if (route === 'top') items = items.sort((a, b) => parseFloat((b.rating || '0')) - parseFloat((a.rating || '0')));
+    if (q) items = items.filter(m => (m.title || '').toLowerCase().includes(q) || (m.genre || '').toLowerCase().includes(q) || (m.desc || '').toLowerCase().includes(q));
+    app.appendChild(renderListPage(route.charAt(0).toUpperCase() + route.slice(1), items));
+  }
+
+  qsa('.nav-link').forEach(a => a.classList.toggle('active', a.dataset.route === route));
+  renderUserBadge();
+}
+
+function renderUserBadge() {
+  const user = getCurrentUser();
+  const btn = qs('#signinBtn');
+  if (!btn) return;
+  btn.textContent = user ? `Hi ${user.name.split(' ')[0]}` : 'Sign In';
+}
+
+function openAuthModal() {
+  const modal = qs('#authModal');
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeAuthModal() {
+  const modal = qs('#authModal');
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+function setupAuthUI() {
+  const signinBtn = qs('#signinBtn');
+  const authModal = qs('#authModal');
+  const closeAuthModalBtn = qs('#closeAuthModal');
+  const signInForm = qs('#signInForm');
+  const signUpForm = qs('#signUpForm');
+  const logoutBtn = qs('#logoutBtn');
+  const authTabs = qsa('.auth-tab');
+
+  signinBtn.addEventListener('click', () => openAuthModal());
+  closeAuthModalBtn.addEventListener('click', closeAuthModal);
+  authModal.addEventListener('click', (event) => {
+    if (event.target === authModal) closeAuthModal();
+  });
+
+  authTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const stage = tab.dataset.authTab;
+      authTabs.forEach(t => t.classList.toggle('active', t === tab));
+      qs('#signInForm').classList.toggle('hidden', stage !== 'signin');
+      qs('#signUpForm').classList.toggle('hidden', stage !== 'signup');
+    });
+  });
+
+  signInForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(signInForm);
+    const email = (fd.get('email') || '').trim().toLowerCase();
+    const password = (fd.get('password') || '').toString();
+    const accounts = getAccounts();
+    const user = accounts.find(a => a.email.toLowerCase() === email && a.password === password);
+
+    if (!user) {
+      alert('Account not found. Create an account or check your password.');
+      return;
+    }
+
+    setCurrentUser({ id: user.id, name: user.name, email: user.email });
+    closeAuthModal();
+    renderUserBadge();
+    renderCurrentRoute();
+  });
+
+  signUpForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(signUpForm);
+    const name = (fd.get('name') || '').trim();
+    const email = (fd.get('email') || '').trim().toLowerCase();
+    const password = (fd.get('password') || '').toString();
+
+    if (!name || !email || !password) {
+      alert('Please fill in all fields.');
+      return;
+    }
+
+    const accounts = getAccounts();
+    if (accounts.some(a => a.email.toLowerCase() === email)) {
+      alert('That email already exists. Sign in instead.');
+      return;
+    }
+
+    const newUser = { id: 'u_' + Date.now(), name, email, password };
+    accounts.push(newUser);
+    saveAccounts(accounts);
+    setCurrentUser({ id: newUser.id, name: newUser.name, email: newUser.email });
+    signUpForm.reset();
+    closeAuthModal();
+    renderUserBadge();
+    renderCurrentRoute();
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    clearCurrentUser();
+    closeAuthModal();
+    renderUserBadge();
+    renderCurrentRoute();
+  });
+
+  const user = getCurrentUser();
+  if (user) {
+    qs('#accountActions').classList.remove('hidden');
+  }
+}
+
+function setupAHUnlock() {
+  const brand = qs('#brandAH');
+  if (!brand) return;
+
+  let count = 0;
+  let timer = null;
+
+  const reset = () => {
+    count = 0;
+    if (timer) clearTimeout(timer);
+    timer = null;
+  };
+
+  brand.addEventListener('click', () => {
+    count += 1;
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(reset, 3000);
+
+    if (count >= 10) {
+      reset();
+      const given = window.prompt('Enter admin password');
+      if (given === 'ADMIN') {
+        localStorage.setItem(ADMIN_UNLOCK_KEY, '1');
+        state.route = 'admin';
+        history.pushState({ route: 'admin' }, '', '#admin');
+        renderCurrentRoute();
+        alert('Admin panel unlocked');
+      } else {
+        alert('Wrong password. AH still unlocks only with ADMIN.');
+      }
+    }
+  });
+
+  brand.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') brand.click();
+  });
+}
+
+function setupNav() {
+  qsa('.nav-link').forEach(a => {
+    a.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      const route = a.dataset.route;
+      state.route = route;
+      state.page = 1;
+      history.pushState({ route }, '', `#${route}`);
+      renderCurrentRoute();
+    });
+  });
+
+  const searchInput = qs('#searchInput');
+  let timer = null;
+  searchInput.addEventListener('input', () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      state.query = searchInput.value || '';
+      state.page = 1;
+      renderCurrentRoute();
+    }, 180);
+  });
+
+  qs('#closePlayer').addEventListener('click', closePlayer);
+  qs('#modal').addEventListener('click', (event) => {
+    if (event.target === qs('#modal')) closePlayer();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closePlayer();
+  });
+}
+
+function setupPopstate() {
+  window.addEventListener('popstate', () => {
+    const route = (location.hash || '#home').replace('#', '') || 'home';
+    state.route = route;
+    renderCurrentRoute();
+  });
+}
+
+const FREE_LIBRARY = [
+  { id: 'free_01', title: 'A Trip to the Moon', desc: 'Classic silent science-fiction adventure.', year: 1902, genre: 'Classic', duration: '14m', rating: '8.5', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Le_Voyage_dans_la_lune.jpg/640px-Le_Voyage_dans_la_lune.jpg', video: '7JDaOOw0MEE', embedType: 'youtube', type: 'movie' },
+  { id: 'free_02', title: 'Nosferatu', desc: 'F.W. Murnau’s haunting horror classic.', year: 1922, genre: 'Horror', duration: '1h 34m', rating: '8.4', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Nosferatu_poster.jpg/640px-Nosferatu_poster.jpg', video: 'wLayKU1IYgU', embedType: 'youtube', type: 'movie' },
+  { id: 'free_03', title: 'The Great Train Robbery', desc: 'Early western and one of cinema’s iconic early films.', year: 1903, genre: 'Western', duration: '12m', rating: '8.2', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Great_Train_Robbery.jpg/640px-Great_Train_Robbery.jpg', video: '3vP8g2uB0fQ', embedType: 'youtube', type: 'movie' },
+  { id: 'free_04', title: 'The Birth of a Nation', desc: 'Landmark early film with historical importance.', year: 1915, genre: 'Drama', duration: '2h 58m', rating: '7.3', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Birth_of_a_Nation_1915.jpg/640px-Birth_of_a_Nation_1915.jpg', video: 'dZHw4d_FM8I', embedType: 'youtube', type: 'movie' },
+  { id: 'free_05', title: 'The Cabinet of Dr. Caligari', desc: 'Expressionist masterpiece of dread.', year: 1920, genre: 'Horror', duration: '1h 16m', rating: '8.4', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Das_Kabinett_des_Dr._Caligari_poster.jpg/640px-Das_Kabinett_des_Dr._Caligari_poster.jpg', video: 'J0u22pQ2r2E', embedType: 'youtube', type: 'movie' },
+  { id: 'free_06', title: 'The Kid', desc: 'Charlie Chaplin’s iconic silent comedy.', year: 1921, genre: 'Comedy', duration: '1h 8m', rating: '8.3', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Kid_1921.jpg/640px-Kid_1921.jpg', video: 'e9pFzZ97s1s', embedType: 'youtube', type: 'movie' },
+  { id: 'free_07', title: 'The Gold Rush', desc: 'Chaplin’s legendary survival comedy.', year: 1925, genre: 'Comedy', duration: '1h 33m', rating: '8.2', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/The_Gold_Rush_poster.jpg/640px-The_Gold_Rush_poster.jpg', video: 'w0UFw1M8c0M', embedType: 'youtube', type: 'movie' },
+  { id: 'free_08', title: 'Sunrise: A Song of Two Humans', desc: 'A lyrical, emotional silent film.', year: 1927, genre: 'Drama', duration: '1h 34m', rating: '8.2', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Sunrise_poster.jpg/640px-Sunrise_poster.jpg', video: 'FLXnRjv4jE8', embedType: 'youtube', type: 'movie' },
+  { id: 'free_09', title: 'The Adventures of Prince Achmed', desc: 'Early animated fantasy.', year: 1926, genre: 'Animation', duration: '1h 12m', rating: '8.0', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Die_Abenteuer_des_Prinz_Achmed.jpg/640px-Die_Abenteuer_des_Prinz_Achmed.jpg', video: 'c7kBUB2S4i8', embedType: 'youtube', type: 'movie' },
+  { id: 'free_10', title: 'The Phantom of the Opera', desc: 'Early horror melodrama.', year: 1925, genre: 'Horror', duration: '1h 12m', rating: '7.7', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Phantom_of_the_Opera_1925.jpg/640px-Phantom_of_the_Opera_1925.jpg', video: 'k60r6c5Gd8E', embedType: 'youtube', type: 'movie' },
+  { id: 'free_11', title: 'Metropolis', desc: 'Futuristic dystopian landmark.', year: 1927, genre: 'Sci-Fi', duration: '2h 20m', rating: '8.3', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Metropolisposter.jpg/640px-Metropolisposter.jpg', video: 'nH8U2WkE0gI', embedType: 'youtube', type: 'movie' },
+  { id: 'free_12', title: 'The Mysterious Mr. Sabin', desc: 'Adventure classic.', year: 1930, genre: 'Adventure', duration: '1h 18m', rating: '7.1', img: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=900&q=60', video: 'dQw4w9WgXcQ', embedType: 'youtube', type: 'movie' },
+  { id: 'free_13', title: 'Dracula', desc: 'Universal classic vampire film.', year: 1931, genre: 'Horror', duration: '1h 15m', rating: '7.8', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Dracula_1931_poster.jpg/640px-Dracula_1931_poster.jpg', video: '8K5doo_4CRc', embedType: 'youtube', type: 'movie' },
+  { id: 'free_14', title: 'Frankenstein', desc: 'Classic monster picture.', year: 1931, genre: 'Horror', duration: '1h 11m', rating: '7.8', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Frankenstein_1931_poster.jpg/640px-Frankenstein_1931_poster.jpg', video: 'xY7g0Eyd0lM', embedType: 'youtube', type: 'movie' },
+  { id: 'free_15', title: 'The Black Cat', desc: 'Pre-Code horror classic.', year: 1934, genre: 'Horror', duration: '1h 3m', rating: '7.4', img: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&q=60', video: 'L_jWHffIx5E', embedType: 'youtube', type: 'movie' },
+  { id: 'free_16', title: 'It Happened One Night', desc: 'Romantic comedy classic.', year: 1934, genre: 'Comedy', duration: '1h 45m', rating: '8.1', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/It_Happened_One_Night_poster.jpg/640px-It_Happened_One_Night_poster.jpg', video: 'L3v0H0vXh0w', embedType: 'youtube', type: 'movie' },
+  { id: 'free_17', title: 'The Informer', desc: 'Political drama with atmosphere.', year: 1935, genre: 'Drama', duration: '1h 52m', rating: '7.4', img: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=900&q=60', video: 'wJ3FhS8QfGs', embedType: 'youtube', type: 'movie' },
+  { id: 'free_18', title: 'Modern Times', desc: 'Chaplin’s industrial satire.', year: 1936, genre: 'Comedy', duration: '1h 27m', rating: '8.5', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Modern_Times_poster.jpg/640px-Modern_Times_poster.jpg', video: 'y35q-9aWQvE', embedType: 'youtube', type: 'movie' },
+  { id: 'free_19', title: 'Snow White and the Seven Dwarfs', desc: 'Groundbreaking animated fairy tale.', year: 1937, genre: 'Animation', duration: '1h 23m', rating: '7.9', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Snow_White_1937_poster.png/640px-Snow_White_1937_poster.png', video: 'AqAMc_Fm8L8', embedType: 'youtube', type: 'movie' },
+  { id: 'free_20', title: 'The Wizard of Oz', desc: 'Classic fantasy adventure.', year: 1939, genre: 'Fantasy', duration: '1h 42m', rating: '8.0', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/The_Wizard_of_Oz_1939_poster.jpg/640px-The_Wizard_of_Oz_1939_poster.jpg', video: 'L1Q6VvB2l2k', embedType: 'youtube', type: 'movie' },
+  { id: 'free_21', title: 'Citizen Kane', desc: 'Iconic classic of film language.', year: 1941, genre: 'Drama', duration: '1h 59m', rating: '8.4', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Citizen_Kane_poster%2C_1941_%28Style_B%2C_unrestored%29.jpg/640px-Citizen_Kane_poster%2C_1941_%28Style_B%2C_unrestored%29.jpg', video: 'nWw_f83wRys', embedType: 'youtube', type: 'movie' },
+  { id: 'free_22', title: 'Casablanca', desc: 'Romantic wartime classic.', year: 1942, genre: 'Romance', duration: '1h 42m', rating: '8.5', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/CasablancaPoster-Gold.jpg/640px-CasablancaPoster-Gold.jpg', video: 'w9Chia2R5JY', embedType: 'youtube', type: 'movie' },
+  { id: 'free_23', title: 'The Maltese Falcon', desc: 'Hard-boiled detective noir.', year: 1941, genre: 'Mystery', duration: '1h 40m', rating: '8.0', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/The_Maltese_Falcon_1941_poster.jpg/640px-The_Maltese_Falcon_1941_poster.jpg', video: 'V8-Qh7dT8lA', embedType: 'youtube', type: 'movie' },
+  { id: 'free_24', title: 'It’s a Wonderful Life', desc: 'Beloved holiday classic.', year: 1946, genre: 'Drama', duration: '2h 10m', rating: '8.6', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/ItsAWonderfulLife.jpg/640px-ItsAWonderfulLife.jpg', video: 'kJc2Wzh1aGM', embedType: 'youtube', type: 'movie' },
+  { id: 'free_25', title: 'The Third Man', desc: 'Atmospheric noir thriller.', year: 1949, genre: 'Thriller', duration: '1h 43m', rating: '8.1', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/ThirdManUSPoster.jpg/640px-ThirdManUSPoster.jpg', video: 'EK7f9DgN6lc', embedType: 'youtube', type: 'tv' },
+  { id: 'free_26', title: 'The Red Shoes', desc: 'Dance and fantasy drama.', year: 1948, genre: 'Drama', duration: '2h 15m', rating: '8.1', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Red_shoes_1948.jpg/640px-Red_shoes_1948.jpg', video: 'gkJx8ZgZkG8', embedType: 'youtube', type: 'movie' },
+  { id: 'free_27', title: 'The Treasure of the Sierra Madre', desc: 'Classic desert adventure.', year: 1948, genre: 'Adventure', duration: '2h 6m', rating: '8.2', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Treasure_of_the_Sierra_Madre_%281948_poster%29.jpg/640px-Treasure_of_the_Sierra_Madre_%281948_poster%29.jpg', video: 'dQw4w9WgXcQ', embedType: 'youtube', type: 'movie' },
+  { id: 'free_28', title: 'The Wrong Box', desc: 'Dark comedy.', year: 1966, genre: 'Comedy', duration: '1h 42m', rating: '7.1', img: 'https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=900&q=60', video: 'dQw4w9WgXcQ', embedType: 'youtube', type: 'movie' },
+  { id: 'free_29', title: 'The Last Hurrah', desc: 'Political drama.', year: 1958, genre: 'Drama', duration: '1h 45m', rating: '7.4', img: 'https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=900&q=60', video: 'dQw4w9WgXcQ', embedType: 'youtube', type: 'movie' },
+  { id: 'free_30', title: 'Paths of Glory', desc: 'War classic.', year: 1957, genre: 'War', duration: '1h 28m', rating: '8.4', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Paths_of_Glory_%281957_poster%29.jpg/640px-Paths_of_Glory_%281957_poster%29.jpg', video: 'D9kKD0x8AA0', embedType: 'youtube', type: 'movie' },
+  { id: 'free_31', title: 'Some Like It Hot', desc: 'Comedy classic.', year: 1959, genre: 'Comedy', duration: '1h 59m', rating: '8.2', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Some_Like_It_Hot_poster.jpg/640px-Some_Like_It_Hot_poster.jpg', video: 'NwP0tPTpQKc', embedType: 'youtube', type: 'movie' },
+  { id: 'free_32', title: 'The Apartment', desc: 'Romantic comedy drama.', year: 1960, genre: 'Comedy', duration: '2h 5m', rating: '8.3', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/The_Apartment_poster.jpg/640px-The_Apartment_poster.jpg', video: 'pqEQ0Jo2w0s', embedType: 'youtube', type: 'movie' },
+  { id: 'free_33', title: 'Psycho', desc: 'Masterclass suspense.', year: 1960, genre: 'Thriller', duration: '1h 49m', rating: '8.5', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Psycho_%281960%29_theatrical_poster.jpg/640px-Psycho_%281960%29_theatrical_poster.jpg', video: 'dQw4w9WgXcQ', embedType: 'youtube', type: 'movie' },
+  { id: 'free_34', title: 'Lawrence of Arabia', desc: 'Epic desert adventure.', year: 1962, genre: 'Adventure', duration: '3h 49m', rating: '8.3', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Lawrence_of_Arabia_%281962%29_poster.jpg/640px-Lawrence_of_Arabia_%281962%29_poster.jpg', video: 'r4A0n6J0G8Q', embedType: 'youtube', type: 'movie' },
+  { id: 'free_35', title: 'The Birds', desc: 'Suspense classic.', year: 1963, genre: 'Thriller', duration: '1h 59m', rating: '7.9', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/The_Birds_1963_poster.jpg/640px-The_Birds_1963_poster.jpg', video: 'w7BS2lqZl4I', embedType: 'youtube', type: 'movie' },
+  { id: 'free_36', title: 'The Good, the Bad and the Ugly', desc: 'Spaghetti western classic.', year: 1966, genre: 'Western', duration: '2h 58m', rating: '8.8', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Il_buono_il_brutto_il_cattivo_poster.jpg/640px-Il_buono_il_brutto_il_cattivo_poster.jpg', video: 'WCN5JJY_wiA', embedType: 'youtube', type: 'movie' },
+  { id: 'free_37', title: 'The Italian Job', desc: 'Heist action fun.', year: 1969, genre: 'Action', duration: '1h 52m', rating: '7.7', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/The_Italian_Job_%281969%29.jpg/640px-The_Italian_Job_%281969%29.jpg', video: 'H8aZRk7XFmA', embedType: 'youtube', type: 'movie' },
+  { id: 'free_38', title: 'The Long Goodbye', desc: 'Stylish noir with bite.', year: 1973, genre: 'Mystery', duration: '1h 58m', rating: '7.7', img: 'https://images.unsplash.com/photo-1522878129833-838a7f21cfaf?auto=format&fit=crop&w=900&q=60', video: 'K9OdlS2i5zM', embedType: 'youtube', type: 'movie' },
+  { id: 'free_39', title: 'The Rocky Horror Picture Show', desc: 'Cult musical comedy.', year: 1975, genre: 'Musical', duration: '1h 38m', rating: '7.3', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Rocky_horror_show.jpg/640px-Rocky_horror_show.jpg', video: 'w4z-b77FG0s', embedType: 'youtube', type: 'movie' },
+  { id: 'free_40', title: 'Jaws', desc: 'Shark classic.', year: 1975, genre: 'Thriller', duration: '2h 4m', rating: '8.1', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Jaws_%281975%29_poster.jpg/640px-Jaws_%281975%29_poster.jpg', video: 'U1fu_sA7XhE', embedType: 'youtube', type: 'movie' },
+  { id: 'free_41', title: 'The Warriors', desc: 'Late 70s action cult.', year: 1979, genre: 'Action', duration: '1h 33m', rating: '7.4', img: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1400&q=60', video: 'nS8wJIO7D2M', embedType: 'youtube', type: 'movie' },
+  { id: 'free_42', title: 'The Godfather', desc: 'Crime classic.', year: 1972, genre: 'Crime', duration: '2h 55m', rating: '9.2', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Godfather_ver1.jpg/640px-Godfather_ver1.jpg', video: 'sY1S34973zA', embedType: 'youtube', type: 'movie' },
+  { id: 'free_43', title: 'The Deer Hunter', desc: 'War drama.', year: 1978, genre: 'War', duration: '3h 3m', rating: '8.1', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/The_Deer_Hunter_poster.jpg/640px-The_Deer_Hunter_poster.jpg', video: 's6qdvD0e_Fc', embedType: 'youtube', type: 'movie' },
+  { id: 'free_44', title: 'Blue Velvet', desc: 'Surreal mystery drama.', year: 1986, genre: 'Mystery', duration: '2h 1m', rating: '7.8', img: 'https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=900&q=60', video: 'hK2xO93AjB0', embedType: 'youtube', type: 'movie' },
+  { id: 'free_45', title: 'The Princess Bride', desc: 'Adventure fantasy whimsy.', year: 1987, genre: 'Adventure', duration: '1h 38m', rating: '8.0', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/The_Princess_Bride_poster.jpg/640px-The_Princess_Bride_poster.jpg', video: 'iQY6uZs6PKA', embedType: 'youtube', type: 'movie' },
+  { id: 'free_46', title: 'The Silence of the Lambs', desc: 'Crime and suspense masterpiece.', year: 1991, genre: 'Thriller', duration: '1h 58m', rating: '8.6', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Silence_of_the_lambs_poster.jpg/640px-Silence_of_the_lambs_poster.jpg', video: 'W6Mm8exA8D4', embedType: 'youtube', type: 'movie' },
+  { id: 'free_47', title: 'Pulp Fiction', desc: 'Cult crime masterpiece.', year: 1994, genre: 'Crime', duration: '2h 34m', rating: '8.9', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Pulp_Fiction_%281994%29_poster.jpg/640px-Pulp_Fiction_%281994%29_poster.jpg', video: 's7EdQ4FqbhY', embedType: 'youtube', type: 'movie' },
+  { id: 'free_48', title: 'The Matrix', desc: 'Sci-fi action landmark.', year: 1999, genre: 'Sci-Fi', duration: '2h 16m', rating: '8.7', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/The_Matrix_Poster.jpg/640px-The_Matrix_Poster.jpg', video: 'vKQi3b8QjG8', embedType: 'youtube', type: 'movie' },
+  { id: 'free_49', title: 'The Sixth Sense', desc: 'Psychological thriller.', year: 1999, genre: 'Thriller', duration: '1h 47m', rating: '8.1', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/The_Sixth_Sense_poster.png/640px-The_Sixth_Sense_poster.png', video: '3-Zp2p3wL4E', embedType: 'youtube', type: 'movie' },
+  { id: 'free_50', title: 'From Dusk Till Dawn', desc: 'Quirky cult thriller.', year: 1996, genre: 'Action', duration: '1h 48m', rating: '7.2', img: 'https://images.unsplash.com/photo-1522878129833-838a7f21cfaf?auto=format&fit=crop&w=900&q=60', video: 'q9YqW5H5e9E', embedType: 'youtube', type: 'movie' },
+  { id: 'free_51', title: 'The Adventures of Sherlock Holmes', desc: 'Classic detective charm.', year: 1939, genre: 'Mystery', duration: '1h 13m', rating: '7.6', img: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=900&q=60', video: 'wB8V3m0_yaQ', embedType: 'youtube', type: 'movie' },
+  { id: 'free_52', title: 'The Invisible Man', desc: 'Classic paranoia thriller.', year: 1933, genre: 'Horror', duration: '1h 12m', rating: '7.7', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Invisible_Man_poster.jpg/640px-Invisible_Man_poster.jpg', video: 'gP9Z0J4wG4g', embedType: 'youtube', type: 'movie' },
+  { id: 'free_53', title: 'The Gold Diggers of 1933', desc: 'Classic musical show.', year: 1933, genre: 'Musical', duration: '1h 41m', rating: '7.3', img: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&q=60', video: 'E9_fYjrlM5M', embedType: 'youtube', type: 'movie' },
+  { id: 'free_54', title: 'The Purple Rose of Cairo', desc: 'Fantasy romance comedy.', year: 1985, genre: 'Comedy', duration: '1h 52m', rating: '7.7', img: 'https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=900&q=60', video: 'U2Dq0Pw9XgM', embedType: 'youtube', type: 'movie' },
+  { id: 'free_55', title: 'M', desc: 'Psychological suspense classic.', year: 1931, genre: 'Crime', duration: '1h 39m', rating: '8.3', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/M_1931_poster.jpg/640px-M_1931_poster.jpg', video: 'n0m0v0hP7m0', embedType: 'youtube', type: 'movie' },
+  { id: 'free_56', title: 'Aelita', desc: 'Space travel classic.', year: 1924, genre: 'Sci-Fi', duration: '1h 10m', rating: '6.9', img: 'https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=900&q=60', video: 'T5JI7S-v3yY', embedType: 'youtube', type: 'movie' },
+  { id: 'free_57', title: 'The General', desc: 'Silent comedy with a locomotive chase.', year: 1926, genre: 'Comedy', duration: '1h 18m', rating: '8.2', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/The_General_poster.jpg/640px-The_General_poster.jpg', video: 'sD0rC4f6WnE', embedType: 'youtube', type: 'movie' },
+  { id: 'free_58', title: 'The White Shadow', desc: 'Classic prison drama.', year: 1924, genre: 'Drama', duration: '1h 42m', rating: '7.1', img: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1400&q=60', video: 'XTy0P0jte1k', embedType: 'youtube', type: 'movie' },
+  { id: 'free_59', title: 'The Story of the Weeping Camel', desc: 'Documentary family story.', year: 2003, genre: 'Documentary', duration: '1h 10m', rating: '7.6', img: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=900&q=60', video: '1uO3Pp2w8D8', embedType: 'youtube', type: 'movie' },
+  { id: 'free_60', title: 'The Fall of the Roman Empire', desc: 'Scope and spectacle.', year: 1964, genre: 'Historical', duration: '2h 55m', rating: '7.0', img: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=900&q=60', video: 'y_F9lzQlhh8', embedType: 'youtube', type: 'movie' }
+];
+
+async function init() {
+  await loadData();
+  setupAuthUI();
+  setupAHUnlock();
+  setupNav();
+  setupPopstate();
+  const route = (location.hash || '#home').replace('#', '') || 'home';
+  state.route = route;
+  renderCurrentRoute();
+}
+
+init();
