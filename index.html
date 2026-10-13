@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Dulo-style Streaming (Demo)</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark"></span><span>DULO</span></div>
+
+      <nav class="nav" aria-label="Main navigation">
+        <a href="#home" data-route="home" class="nav-link active">Home</a>
+        <a href="#movies" data-route="movies" class="nav-link">Movies</a>
+        <a href="#tv" data-route="tv" class="nav-link">TV Shows</a>
+        <a href="#new" data-route="new" class="nav-link">New</a>
+        <a href="#top" data-route="top" class="nav-link">Top</a>
+        <a href="#mylist" data-route="mylist" class="nav-link">My List</a>
+        <a href="#admin" data-route="admin" class="nav-link">Admin</a>
+      </nav>
+
+      <div class="top-actions">
+        <div class="search" role="search">
+          <span>🔍</span>
+          <input id="searchInput" type="search" placeholder="Search movies, shows..." aria-label="Search" />
+        </div>
+        <button id="signinBtn" class="btn btn-primary">Sign In</button>
+      </div>
+    </header>
+
+    <main id="app">
+      <!-- Sections will be injected by JS -->
+    </main>
+  </div>
+
+  <!-- Modal Player -->
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="player" role="dialog" aria-label="Video player">
+      <button id="closePlayer" class="close" aria-label="Close player">✕</button>
+      <iframe id="playerIframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <script src="js/app.js" defer></script>
+</body>
+</html>

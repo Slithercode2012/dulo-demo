@@ -1,0 +1,110 @@
+[
+  {
+    "id": "m1",
+    "title": "Midnight Signal",
+    "img": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=60",
+    "desc": "A disgraced radio host discovers a hidden signal from the future.",
+    "year": 2026,
+    "genre": "Action",
+    "duration": "2h 14m",
+    "rating": "8.9",
+    "video": "aqz-KE-bpKQ",
+    "type": "movie"
+  },
+  {
+    "id": "m2",
+    "title": "The Last Horizon",
+    "img": "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=900&q=60",
+    "desc": "Escape to the last frontier in an epic journey.",
+    "year": 2025,
+    "genre": "Drama",
+    "duration": "1h 58m",
+    "rating": "8.3",
+    "video": "ScMzIvxBSi4",
+    "type": "movie"
+  },
+  {
+    "id": "m3",
+    "title": "Shadow Echo",
+    "img": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=60",
+    "desc": "Secrets echoed through the alleys of a neon city.",
+    "year": 2024,
+    "genre": "Thriller",
+    "duration": "2h 04m",
+    "rating": "8.6",
+    "video": "dQw4w9WgXcQ",
+    "type": "tv"
+  },
+  {
+    "id": "m4",
+    "title": "Glass City",
+    "img": "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=900&q=60",
+    "desc": "A reporter uncovers a city built on glass lies.",
+    "year": 2023,
+    "genre": "Mystery",
+    "duration": "1h 46m",
+    "rating": "7.9",
+    "video": "kXYiU_JCYtU",
+    "type": "movie"
+  },
+  {
+    "id": "m5",
+    "title": "Nightfall",
+    "img": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=900&q=60",
+    "desc": "When night falls, heroes rise.",
+    "year": 2022,
+    "genre": "Action",
+    "duration": "2h 01m",
+    "rating": "8.1",
+    "video": "J---aiyznGQ",
+    "type": "movie"
+  },
+  {
+    "id": "m6",
+    "title": "Silver Moon",
+    "img": "https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=900&q=60",
+    "desc": "A sci-fi epic about a colony on the far side of the moon.",
+    "year": 2024,
+    "genre": "Sci-Fi",
+    "duration": "2h 19m",
+    "rating": "9.6",
+    "video": "3JZ_D3ELwOQ",
+    "type": "movie"
+  },
+  {
+    "id": "m7",
+    "title": "Black Harbor",
+    "img": "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&q=60",
+    "desc": "A small town's secrets come to light when the harbor freezes over.",
+    "year": 2021,
+    "genre": "Drama",
+    "duration": "1h 52m",
+    "rating": "9.4",
+    "video": "L_jWHffIx5E",
+    "type": "movie"
+  },
+  {
+    "id": "pd_a_trip_to_the_moon",
+    "title": "A Trip to the Moon (1902)",
+    "img": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Le_Voyage_dans_la_lune.jpg",
+    "desc": "Georges Méliès' classic silent short — public domain.",
+    "year": 1902,
+    "genre": "Silent",
+    "duration": "14m",
+    "rating": "8.5",
+    "video": "7JDaOOw0MEE",
+    "type": "movie"
+  },
+  {
+    "id": "pd_nosferatu_1922",
+    "title": "Nosferatu (1922)",
+    "img": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Nosferatu_poster.jpg",
+    "desc": "F.W. Murnau's silent horror classic — public domain in many regions.",
+    "year": 1922,
+    "genre": "Horror",
+    "duration": "1h 34m",
+    "rating": "8.1",
+    "video": "wLayKU1IYgU",
+    "type": "movie"
+  }
+]
