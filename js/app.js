@@ -3,7 +3,7 @@
 // - Renders Home, Movies, TV, My List
 // - Search, pagination, modal player, localStorage My List
 // - Admin panel to add movies (saved to localStorage) and export JSON
-// - Easter egg: clicking AH 10 times opens admin panel
+// - Easter egg: clicking AH 10 times opens admin panel (and unlocks it)
 
 const DATA_URL = 'data/movies.json';
 const PER_PAGE = 8;
@@ -294,7 +294,15 @@ function renderCurrentRoute(){
   } else if(route === 'mylist'){
     app.appendChild(renderMyList());
   } else if(route === 'admin'){
-    app.appendChild(renderAdmin());
+    const unlocked = localStorage.getItem('admin_unlocked_v1') === '1';
+    if(unlocked){
+      app.appendChild(renderAdmin());
+    } else {
+      // admin locked — redirect to home
+      state.route = 'home';
+      history.replaceState({}, '', '#home');
+      app.appendChild(renderHome());
+    }
   } else {
     // movies/tv/new/top = different filtered lists. For demo we filter by genre if set.
     let items = MOVIES.slice();
@@ -361,6 +369,8 @@ function setupEvents(){
       timer = setTimeout(resetCount, 3000); // reset after 3s of inactivity
       if(count >= 10){
         resetCount();
+        // unlock admin in localStorage
+        localStorage.setItem('admin_unlocked_v1', '1');
         state.route = 'admin';
         history.pushState({route:'admin'}, '', '#admin');
         renderCurrentRoute();
