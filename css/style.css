@@ -1,67 +1,88 @@
-[
-  {
-    "id": "seed_01",
-    "title": "Midnight Signal",
-    "img": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=60",
-    "desc": "A disgraced radio host discovers a hidden signal from the future.",
-    "year": 2026,
-    "genre": "Action",
-    "duration": "2h 14m",
-    "rating": "8.9",
-    "video": "aqz-KE-bpKQ",
-    "embedType": "youtube",
-    "type": "movie"
-  },
-  {
-    "id": "seed_02",
-    "title": "The Last Horizon",
-    "img": "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=900&q=60",
-    "desc": "Escape to the last frontier in an epic journey.",
-    "year": 2025,
-    "genre": "Drama",
-    "duration": "1h 58m",
-    "rating": "8.3",
-    "video": "ScMzIvxBSi4",
-    "embedType": "youtube",
-    "type": "movie"
-  },
-  {
-    "id": "seed_03",
-    "title": "Shadow Echo",
-    "img": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=60",
-    "desc": "Secrets echoed through the alleys of a neon city.",
-    "year": 2024,
-    "genre": "Thriller",
-    "duration": "2h 04m",
-    "rating": "8.6",
-    "video": "dQw4w9WgXcQ",
-    "embedType": "youtube",
-    "type": "tv"
-  },
-  {
-    "id": "seed_04",
-    "title": "Glass City",
-    "img": "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=900&q=60",
-    "desc": "A reporter uncovers a city built on glass lies.",
-    "year": 2023,
-    "genre": "Mystery",
-    "duration": "1h 46m",
-    "rating": "7.9",
-    "video": "kXYiU_JCYtU",
-    "embedType": "youtube",
-    "type": "movie"
-  },
-  {
-    "id": "seed_05",
-    "title": "Nightfall",
-    "img": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=900&q=60",
-    "desc": "When night falls, heroes rise.",
-    "year": 2022,
-    "genre": "Action",
-    "duration": "2h 01m",
-    "rating": "8.1",
-    "video": "J---aiyznGQ",
-    "embedType": "youtube",
-    "type": "movie"
-  }
-]
+:root{
+  --bg:#090d18;
+  --text:#edf3ff;
+  --muted:#9aa5b1;
+  --accent:#ff5a3d;
+  --panel:rgba(17,24,39,0.7);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top, rgba(86,110,255,0.12), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(255,92,77,0.08), transparent 20%),
+    var(--bg);
+}
+
+a { color: inherit; text-decoration: none; }
+.page { max-width: 1360px; margin: 0 auto; padding: 20px; }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.brand {
+  display: flex; align-items: center; gap: 8px; font-weight: 800;
+  cursor: pointer; user-select: none; padding: 6px 10px; border-radius: 10px;
+}
+.brand:hover { background: rgba(255,255,255,0.03); }
+.brand-mark { width: 14px; height: 14px; background: linear-gradient(135deg, var(--accent), #ff8554); border-radius: 4px; }
+.brand-text { letter-spacing: 0.12em; }
+.nav { display: flex; gap: 14px; align-items: center; }
+.nav a { opacity: .9; padding: 8px; border-radius: 8px; }
+.nav a.active { background: rgba(255,255,255,0.04); }
+.top-actions { display: flex; gap: 12px; align-items: center; }
+.search {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.search input {
+  background: transparent; border: 0; color: var(--text); outline: 0; width: 220px;
+}
+.btn { cursor: pointer; border: 0; padding: 10px 14px; border-radius: 10px; font-weight: 600; }
+.btn-primary { background: linear-gradient(135deg, var(--accent), #ff8a3d); color: #fff; }
+.hero {
+  margin-top: 18px; border-radius: 18px; overflow: hidden; padding: 36px;
+  background:
+    linear-gradient(90deg, rgba(8,14,24,0.90) 0%, rgba(8,14,24,0.70) 25%, rgba(8,14,24,0.35) 58%, rgba(8,14,24,0.65) 100%),
+    url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1400&q=60') center/cover no-repeat;
+  display: flex; gap: 20px; align-items: flex-end;
+}
+.hero-copy h1 { margin: 0; font-size: 3rem; line-height: 0.95; }
+.hero-copy p { color: rgba(255,255,255,0.9); max-width: 52ch; }
+.hero-poster { width: 220px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); }
+.hero-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.content { display: grid; grid-template-columns: 1fr 320px; gap: 22px; margin-top: 22px; }
+.panel {
+  background: var(--panel); padding: 18px; border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.horizontal-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.movie-card {
+  border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform .18s;
+  position: relative; border: 1px solid rgba(255,255,255,0.03);
+}
+.movie-card:hover { transform: translateY(-6px); }
+.movie-card img { width: 100%; height: 240px; object-fit: cover; display: block; }
+.movie-info { position: absolute; inset: auto 0 0 0; padding: 12px; background: linear-gradient(180deg,transparent, rgba(4,8,18,0.9)); }
+.movie-name { font-weight: 700; }
+.badge { background: rgba(255,255,255,0.06); padding: 4px 8px; border-radius: 999px; font-size: .8rem; }
+.genres { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { background: rgba(255,255,255,0.04); padding: 8px 10px; border-radius: 999px; font-size: .85rem; }
+.side-col { display: flex; flex-direction: column; gap: 14px; }
+.rank-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.rank-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-radius: 8px; background: rgba(255,255,255,0.02); }
+.muted { color: var(--muted); font-size: .88rem; }
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 1000; }
+.modal.open { display: flex; }
+.player { width: min(1100px,100%); background: #000; border-radius: 12px; overflow: hidden; position: relative; }
+.player iframe { width: 100%; height: 620px; border: 0; display: block; }
+.player .close { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.06); border-radius: 8px; padding: 8px; cursor: pointer; color: #fff; }
+.page-section { display: block; }
+.hidden { display: none; }
+.pager { display: flex; gap: 8px; justify-content: center; margin-top: 12px; }
+.pager button { padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04); background: transparent; color: var(--text); cursor: pointer; }
+@media(max-width:1080px){ .horizontal-list { grid-template-columns: repeat(3, 1fr); } .content { grid-template-columns: 1fr; } }
+@media(max-width:740px){ .horizontal-list { grid-template-columns: repeat(1, 1fr); } .search input { width: 120px; } .hero { flex-direction: column; align-items: flex-start; } .hero-poster { width: 100%; } }
